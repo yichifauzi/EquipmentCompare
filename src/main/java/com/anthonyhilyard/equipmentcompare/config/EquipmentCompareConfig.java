@@ -9,13 +9,13 @@ import com.electronwill.nightconfig.core.Config;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 
-@SuppressWarnings("deprecation")
 public class EquipmentCompareConfig
 {
 	public static final ForgeConfigSpec SPEC;
@@ -61,11 +61,11 @@ public class EquipmentCompareConfig
 		build.pop().pop();
 	}
 
-	public static boolean isItemBlacklisted(ItemStack itemStack)
+	public static boolean isItemBlacklisted(ItemStack itemStack, HolderLookup.Provider provider)
 	{
 		for (String entry : INSTANCE.blacklist.get())
 		{
-			if (Selectors.itemMatches(itemStack, entry))
+			if (Selectors.itemMatches(itemStack, entry, provider))
 			{
 				return true;
 			}

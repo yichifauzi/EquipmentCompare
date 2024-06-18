@@ -2,7 +2,6 @@ package com.anthonyhilyard.equipmentcompare.compat;
 
 import com.anthonyhilyard.legendarytooltips.config.LegendaryTooltipsConfig;
 
-@SuppressWarnings("deprecation")
 public class LegendaryTooltipsHandler
 {
 	public static boolean getCenteredTitle()

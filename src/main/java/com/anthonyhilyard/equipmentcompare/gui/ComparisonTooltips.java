@@ -10,9 +10,9 @@ import com.anthonyhilyard.equipmentcompare.config.EquipmentCompareConfig;
 import com.anthonyhilyard.iceberg.events.RenderTooltipEvents;
 import com.anthonyhilyard.iceberg.events.RenderTooltipEvents.ColorExtResult;
 import com.anthonyhilyard.iceberg.util.GuiHelper;
+import com.anthonyhilyard.iceberg.util.ItemUtil;
 import com.anthonyhilyard.iceberg.util.Tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,7 +22,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.locale.Language;
@@ -31,7 +30,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
@@ -44,7 +42,6 @@ public class ComparisonTooltips
 	private static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
 	private static final int DEFAULT_BORDER_COLOR_END = 0x5028007F;
 
-	@SuppressWarnings("deprecation")
 	private static MutableComponent getEquippedBadge()
 	{
 		MutableComponent equippedBadge;
@@ -59,7 +56,7 @@ public class ComparisonTooltips
 		return equippedBadge;
 	}
 
-	@SuppressWarnings({"null", "deprecation"})
+	@SuppressWarnings({"null"})
 	private static void drawTooltip(GuiGraphics graphics, ClientTooltipPositioner positioner, ItemStack itemStack, Rect2i rect, List<ClientTooltipComponent> tooltipLines, Font font, Screen screen, int maxWidth, boolean showBadge, boolean centeredTitle, int index)
 	{
 		int bgColor = EquipmentCompareConfig.INSTANCE.badgeBackgroundColor.get().intValue();
@@ -81,7 +78,7 @@ public class ComparisonTooltips
 
 			poseStack.pushPose();
 			poseStack.translate(0, 0, 401);
-			BufferSource renderType = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+			BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
 			Matrix4f matrix = poseStack.last().pose();
 
@@ -121,27 +118,27 @@ public class ComparisonTooltips
 				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 5 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
 
-			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), renderType, Font.DisplayMode.NORMAL, 0x000000, 0xF000F0);
-			renderType.endBatch();
+			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0x000000, 0xF000F0);
+			bufferSource.endBatch();
 			poseStack.popPose();
 		}
 
 		Tooltips.renderItemTooltip(itemStack, new Tooltips.TooltipInfo(tooltipLines, font, Tooltips.calculateTitleLines(tooltipLines)), rect, screen.width, screen.height, DEFAULT_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_BORDER_COLOR_START, DEFAULT_BORDER_COLOR_END, graphics, positioner, showBadge, constrainToRect, centeredTitle, index);
 	}
 
-	@SuppressWarnings({"unchecked", "null", "deprecation"})
+	@SuppressWarnings({"unchecked", "null"})
 	public static boolean render(GuiGraphics graphics, ClientTooltipPositioner positioner, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
 	{
 		// The screen must be valid to render tooltips.
-		if (screen == null || minecraft == null || minecraft.player == null || minecraft.player.containerMenu == null || itemStack == null)
+		if (screen == null || minecraft == null || minecraft.player == null || minecraft.player.containerMenu == null || minecraft.level == null || itemStack == null)
 		{
 			return false;
 		}
 
-		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.isItemBlacklisted(itemStack))
+		if (minecraft.player.containerMenu.getCarried().isEmpty() && !itemStack.isEmpty() && !EquipmentCompareConfig.isItemBlacklisted(itemStack, minecraft.level.registryAccess()))
 		{
 			// If this is a piece of equipment and we are already wearing the same type, display an additional tooltip as well.
-			EquipmentSlot slot = Mob.getEquipmentSlotForItem(itemStack);
+			EquipmentSlot slot = ItemUtil.getEquipmentSlot(itemStack);
 
 			List<ItemStack> equippedItems = new ArrayList<ItemStack>();
 			ItemStack equippedItem = minecraft.player.getItemBySlot(slot);
@@ -153,7 +150,7 @@ public class ComparisonTooltips
 			{
 				// Ensure both items are comparable.
 				// Any item with durability can be compared.
-				if (!itemStack.getItem().canBeDepleted() || !equippedItem.getItem().canBeDepleted())
+				if (!itemStack.isDamageableItem() || !equippedItem.isDamageableItem())
 				{
 					checkItem = false;
 				}
@@ -188,7 +185,7 @@ public class ComparisonTooltips
 			}
 
 			// Filter blacklisted items.
-			equippedItems.removeIf(stack -> EquipmentCompareConfig.isItemBlacklisted(stack));
+			equippedItems.removeIf(stack -> EquipmentCompareConfig.isItemBlacklisted(stack, minecraft.level.registryAccess()));
 
 			// Make sure we don't compare an item to itself (can happen with Trinkets slots).
 			equippedItems.remove(itemStack);

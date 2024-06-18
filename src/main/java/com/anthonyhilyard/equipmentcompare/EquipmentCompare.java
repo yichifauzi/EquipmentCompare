@@ -3,7 +3,7 @@ package com.anthonyhilyard.equipmentcompare;
 import com.anthonyhilyard.equipmentcompare.config.EquipmentCompareConfig;
 import com.mojang.blaze3d.platform.InputConstants;
 
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
-@SuppressWarnings("deprecation")
 public class EquipmentCompare implements ClientModInitializer
 {
 	public static final Logger LOGGER = LogManager.getLogger(Loader.MODID);
