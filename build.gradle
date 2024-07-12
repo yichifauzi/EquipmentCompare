@@ -1,75 +1,52 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id 'maven-publish'
+	id 'dev.architectury.loom' version '1.6-SNAPSHOT' apply false
+	id 'architectury-plugin' version '3.4-SNAPSHOT'
+	id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
+architectury {
+	minecraft = project.minecraftVersion
+}
 
-archivesBaseName = project.name + '-' + project.mcVersion + '-fabric'
+allprojects {
+	group = rootProject.group
+	version = rootProject.modVersion
+}
 
-sourceSets.main.java.srcDirs += 'java'
-sourceSets.main.resources.srcDirs += 'resources'
+subprojects {
+	apply plugin: 'dev.architectury.loom'
+	apply plugin: 'architectury-plugin'
 
-repositories {
-	maven {
-		name = "CurseMaven"
-		url = "https://www.cursemaven.com"
-		content { includeGroup "curse.maven" }
+	base {
+		archivesName = "$rootProject.name-$rootProject.minecraftVersion-$project.name"
 	}
-	maven {
-		name = "Fuzs Mod Resources"
-		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+
+	repositories {
+		maven {
+			name = "CurseMaven"
+			url = "https://www.cursemaven.com"
+		}
 	}
-	maven {
-		name = "Ladysnake Libs"
-		url = "https://maven.ladysnake.org/releases"
+
+	dependencies {
+		minecraft "net.minecraft:minecraft:$rootProject.minecraftVersion"
+		mappings loom.officialMojangMappings()
+
+		modImplementation files("../libs/Iceberg-1.21-common-1.2.0.jar")
+		modImplementation files("../libs/LegendaryTooltips-1.21-common-1.4.7.jar")
+		modImplementation "curse.maven:adorned-1036809:5515068"
 	}
-}
 
-dependencies {
-	minecraft "com.mojang:minecraft:${mcVersion}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${loaderVersion}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricVersion}"
-
-	modImplementation files("libs/Iceberg-1.21-fabric-1.1.24.jar")
-	modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeConfigApiVersion}"
-	modImplementation files("libs/LegendaryTooltips-1.21-fabric-1.4.6.jar")
-
-	// These are all needed for Trinkets.
-	// modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${ccaVersion}")
-	// modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${ccaVersion}")
-	// modImplementation "curse.maven:trinkets-341284:5173502"
-
-	modImplementation "curse.maven:roughlyenoughitems-310111:5301357"
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/${project.name.toLowerCase()}.accesswidener")
-}
-
-processResources {
-	inputs.property 'version', project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	java {
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 	}
-}
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 21
-}
+	tasks.withType(JavaCompile).configureEach {
+		it.options.release = 21
+	}
 
-jar {
-	manifest {
-		attributes(["Specification-Title":		project.name,
-					"Specification-Vendor":		project.author,
-					"Specification-Version":	project.version,
-					"Implementation-Title":		project.name,
-					"Implementation-Version":	project.version,
-					"Implementation-Vendor" :	project.author,
-					"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+	remapJar {
+		destinationDirectory = file("$buildDir/../../output")
 	}
 }
