@@ -18,7 +18,7 @@ public class EquipmentCompareConfig extends IcebergConfig<EquipmentCompareConfig
 
 	public final Supplier<Boolean> defaultOn;
 	public final Supplier<Boolean> strict;
-	public final Supplier<Long> maxComparisons;
+	public final Supplier<Integer> maxComparisons;
 	public final Supplier<Long> badgeBackgroundColor;
 	public final Supplier<Long> badgeBorderStartColor;
 	public final Supplier<Long> badgeBorderEndColor;
@@ -31,7 +31,7 @@ public class EquipmentCompareConfig extends IcebergConfig<EquipmentCompareConfig
 	{
 		build.comment("Client Configuration").push("client").push("visual_options");
 
-		maxComparisons = build.comment(" The maximum number of comparison tooltips to show onscreen at once.").addInRange("max_comparisons", 3L, 1L, 10L);
+		maxComparisons = build.comment(" The maximum number of comparison tooltips to show onscreen at once.").addInRange("max_comparisons", 3, 1, 10);
 		overrideBadgeText = build.comment(" If badge_text should override the built-in translatable text.").add("override_badge_text", false);
 		badgeText = build.comment(" The text shown on the badge above equipped tooltips.").add("badge_text", "Equipped");
 		badgeTextColor = build.comment(" The color of the text shown on the badge above equipped tooltips.").addInRange("badge_text_color", 0xFFFFFFFFL, 0x00000000L, 0xFFFFFFFFL);
