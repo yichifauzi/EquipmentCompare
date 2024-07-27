@@ -5,12 +5,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import com.anthonyhilyard.equipmentcompare.EquipmentCompare;
+import com.anthonyhilyard.iceberg.services.Services;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,40 +27,71 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin
 {
-	@Nullable
-	@Shadow
-	@Final
-	private Minecraft minecraft;
+	@Unique
+	private static Field tooltipStackField = null;
 
 	@Unique
 	public void setTooltipStack(ItemStack stack)
 	{
+		if (tooltipStackField == null)
+		{
+			try
+			{
+				switch (Services.PLATFORM.getPlatformName())
+				{
+					case "Fabric":
+						tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
+					default:
+						tooltipStackField = GuiGraphics.class.getDeclaredField("tooltipStack");
+						break;
+				}
+				
+				tooltipStackField.setAccessible(true);
+			}
+			catch (Exception e)
+			{
+				EquipmentCompare.LOGGER.debug(ExceptionUtils.getStackTrace(e));
+			}
+		}
+		
 		try
 		{
-			Field tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
-			tooltipStackField.setAccessible(true);
 			tooltipStackField.set(this, stack);
 		}
-		catch (Exception e)
-		{
-			EquipmentCompare.LOGGER.error(ExceptionUtils.getStackTrace(e));
-		}
+		catch (Exception e) {}
 	}
 
 	@Unique
 	public ItemStack getTooltipStack()
 	{
+		if (tooltipStackField == null)
+		{
+			try
+			{
+				switch (Services.PLATFORM.getPlatformName())
+				{
+					case "Fabric":
+						tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
+					default:
+						tooltipStackField = GuiGraphics.class.getDeclaredField("tooltipStack");
+						break;
+				}
+				
+				tooltipStackField.setAccessible(true);
+			}
+			catch (Exception e)
+			{
+				EquipmentCompare.LOGGER.debug(ExceptionUtils.getStackTrace(e));
+			}
+		}
+
 		try
 		{
-			Field tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
-			tooltipStackField.setAccessible(true);
 			return (ItemStack)tooltipStackField.get(this);
 		}
-		catch (Exception e)
-		{
-			EquipmentCompare.LOGGER.error(ExceptionUtils.getStackTrace(e));
-			return ItemStack.EMPTY;
-		}
+		catch (Exception e) {}
+
+		return ItemStack.EMPTY;
 	}
 
 	private static boolean renderComparisonTooltips(GuiGraphics graphics, ClientTooltipPositioner positioner, int x, int y, ItemStack itemStack, Minecraft minecraft, Font font, Screen screen)
@@ -83,6 +112,7 @@ public class GuiGraphicsMixin
 	public void renderTooltip(Font font, ItemStack itemStack, int x, int y, CallbackInfo info)
 	{
 		GuiGraphics self = (GuiGraphics)(Object)this;
+		Minecraft minecraft = Minecraft.getInstance();
 		Screen currentScreen = minecraft.screen;
 		tooltipsDisplayed = false;
 
@@ -108,6 +138,7 @@ public class GuiGraphicsMixin
 	public void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info)
 	{
 		GuiGraphics self = (GuiGraphics)(Object)this;
+		Minecraft minecraft = Minecraft.getInstance();
 		Screen currentScreen = minecraft.screen;
 		ItemStack tooltipStack = getTooltipStack();
 

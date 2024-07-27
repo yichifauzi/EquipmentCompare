@@ -30,7 +30,7 @@ description='''Adds additional tooltips when hovering over equipment for easy co
 	modId="iceberg"
 	mandatory=true
 	versionRange="[1.2.0,)"
-	ordering="NONE"
+	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.equipmentcompare]]
