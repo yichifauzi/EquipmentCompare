@@ -21,9 +21,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -75,8 +73,7 @@ public class ComparisonTooltips
 			}
 
 			poseStack.pushPose();
-			poseStack.translate(0, 0, 401);
-			BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+			poseStack.translate(rect.getX(), rect.getY(), 401);
 
 			Matrix4f matrix = poseStack.last().pose();
 
@@ -84,7 +81,7 @@ public class ComparisonTooltips
 
 			// Draw the "equipped" badge.
 			// If legendary tooltips is installed, AND this item needs a custom border display the badge lower and without a border.
-			if (Services.PLATFORM.isModLoaded("legendarytooltips"))
+			if (Services.getPlatformHelper().isModLoaded("legendarytooltips"))
 			{
 				bgColor = DEFAULT_BACKGROUND_COLOR;
 
@@ -98,26 +95,26 @@ public class ComparisonTooltips
 				constrainToRect = true;
 				badgeOffset = 6;
 				
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX(),							 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7,	 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 5 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 6 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-17 + badgeOffset, rect.getWidth() + 7, -16 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 0,					-16 + badgeOffset, 1, 					-5 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, rect.getWidth() + 7,	-16 + badgeOffset, rect.getWidth() + 8,	-5 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-16 + badgeOffset, rect.getWidth() + 7, -6 + badgeOffset,  bgColor, bgColor);
 			}
 			else
 			{
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 17 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 16 + badgeOffset, bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX(),							 rect.getY() - 16 + badgeOffset, rect.getX() + 1, 					rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 7,	 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 8,	rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 4 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 3 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  bgColor, bgColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 15 + badgeOffset, rect.getX() + 2, 					rect.getY() - 5 + badgeOffset,  borderStartColor, borderEndColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + rect.getWidth() + 6,	 rect.getY() - 15 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 5 + badgeOffset,  borderStartColor, borderEndColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 16 + badgeOffset, rect.getX() + rect.getWidth() + 7, rect.getY() - 15 + badgeOffset, borderStartColor, borderStartColor);
-				GuiHelper.drawGradientRect(matrix, -1, rect.getX() + 1,						 rect.getY() - 5 + badgeOffset,  rect.getX() + rect.getWidth() + 7, rect.getY() - 4 + badgeOffset,  borderEndColor,   borderEndColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-17 + badgeOffset, rect.getWidth() + 7, -16 + badgeOffset, bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 0,					-16 + badgeOffset, 1, 					-4 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, rect.getWidth() + 7,	-16 + badgeOffset, rect.getWidth() + 8,	-4 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-4 + badgeOffset,  rect.getWidth() + 7, -3 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-16 + badgeOffset, rect.getWidth() + 7, -4 + badgeOffset,  bgColor, bgColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-15 + badgeOffset, 2, 					-5 + badgeOffset,  borderStartColor, borderEndColor);
+				GuiHelper.drawGradientRect(matrix, -1, rect.getWidth() + 6,	-15 + badgeOffset, rect.getWidth() + 7, -5 + badgeOffset,  borderStartColor, borderEndColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-16 + badgeOffset, rect.getWidth() + 7, -15 + badgeOffset, borderStartColor, borderStartColor);
+				GuiHelper.drawGradientRect(matrix, -1, 1,					-5 + badgeOffset,  rect.getWidth() + 7, -4 + badgeOffset,  borderEndColor,   borderEndColor);
 			}
 
-			font.drawInBatch(Language.getInstance().getVisualOrder(equippedBadge), (float)rect.getX() + (rect.getWidth() - font.width(equippedBadge)) / 2 + 4, (float)rect.getY() - 14 + badgeOffset, -1, true, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0x000000, 0xF000F0);
-			bufferSource.endBatch();
+			graphics.drawCenteredString(font, equippedBadge, rect.getWidth() / 2 + 4, badgeOffset - 14, -1);
+
 			poseStack.popPose();
 		}
 
@@ -170,7 +167,7 @@ public class ComparisonTooltips
 			}
 
 			// If Trinkets is installed, check for equipped trinkets to compare as well.
-			if (Services.PLATFORM.isModLoaded("trinkets"))
+			if (Services.getPlatformHelper().isModLoaded("trinkets"))
 			{
 				try
 				{
@@ -183,7 +180,7 @@ public class ComparisonTooltips
 			}
 
 			// If Curios is installed, check for equipped curios to compare.
-			if (Services.PLATFORM.isModLoaded("curios") && Services.PLATFORM.getPlatformName().contentEquals("neoforge"))
+			if (Services.getPlatformHelper().isModLoaded("curios") && Services.getPlatformHelper().getPlatformName().contentEquals("neoforge"))
 			{
 				// TODO: Make this a service if Curios comes back to Forge.
 				try
@@ -218,7 +215,7 @@ public class ComparisonTooltips
 			{
 				int maxWidth = ((screen.width - (equippedItems.size() * 16)) / (equippedItems.size() + 1));
 
-				Font itemFont = Services.FONT_LOOKUP.getTooltipFont(itemStack, screen);
+				Font itemFont = Services.getFontLookup().getTooltipFont(itemStack, screen);
 				if (itemFont == null)
 				{
 					itemFont = font;
@@ -227,7 +224,7 @@ public class ComparisonTooltips
 				boolean centeredTitle = false, enforceMinimumWidth = false;
 
 				// If Legendary Tooltips is loaded, check if we need to center the title or enforce a minimum width.
-				if (Services.PLATFORM.isModLoaded("legendarytooltips"))
+				if (Services.getPlatformHelper().isModLoaded("legendarytooltips"))
 				{
 					try
 					{
@@ -263,9 +260,9 @@ public class ComparisonTooltips
 				// Set up tooltip rects.
 				for (ItemStack thisItem : equippedItems)
 				{
-					if (Services.FONT_LOOKUP.getTooltipFont(thisItem, screen) != null)
+					if (Services.getFontLookup().getTooltipFont(thisItem, screen) != null)
 					{
-						itemFont = Services.FONT_LOOKUP.getTooltipFont(thisItem, screen);
+						itemFont = Services.getFontLookup().getTooltipFont(thisItem, screen);
 					}
 
 					List<ClientTooltipComponent> equippedTooltipLines = Tooltips.gatherTooltipComponents(thisItem, Screen.getTooltipFromItem(minecraft, thisItem), thisItem.getTooltipImage(), x - previousRect.getWidth() - 14, screen.width, screen.height, itemFont, font, maxWidth, tooltipIndex++);
