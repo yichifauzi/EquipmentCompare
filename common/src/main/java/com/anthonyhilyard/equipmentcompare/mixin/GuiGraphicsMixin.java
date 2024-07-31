@@ -37,7 +37,7 @@ public class GuiGraphicsMixin
 		{
 			try
 			{
-				switch (Services.PLATFORM.getPlatformName())
+				switch (Services.getPlatformHelper().getPlatformName())
 				{
 					case "Fabric":
 						tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
@@ -68,7 +68,7 @@ public class GuiGraphicsMixin
 		{
 			try
 			{
-				switch (Services.PLATFORM.getPlatformName())
+				switch (Services.getPlatformHelper().getPlatformName())
 				{
 					case "Fabric":
 						tooltipStackField = GuiGraphics.class.getDeclaredField("icebergTooltipStack");
